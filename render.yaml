@@ -9,13 +9,3 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
-      - key: DATABASE_URL
-        fromDatabase:
-          name: dyad-db
-          property: connectionString
-
-databases:
-  - name: dyad-db
-    plan: free
-    databaseName: dyad
-    user: dyad_user
