@@ -21,4 +21,4 @@ Ce repository permet de déployer gratuitement le projet [dyad](https://github.c
 - [dyad sur GitHub](https://github.com/iaautomatalex/dyad)
 - [Render.com](https://render.com)
 
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/iaautomatalex/dyad)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/iaautomatalex/Render-dyad)
