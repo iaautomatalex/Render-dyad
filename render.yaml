@@ -1,11 +1,21 @@
 services:
   - type: web
     name: dyad
-    env: node
+    env: docker
+    region: frankfurt # Tu peux changer pour oregon (USA) si tu préfères
     plan: free
-    buildCommand: |
-      if [ -f tsconfig.json ]; then npm run build || true; fi
-    startCommand: npm run start
+    healthCheckPath: /api/healthz
     envVars:
-      - key: NODE_ENV
-        value: production
+      - key: DATABASE_URL
+        fromDatabase:
+          name: dyad-db
+          property: connectionString
+      - key: DYAD_SECRET
+        generateValue: true
+      - key: DYAD_ADDRESS
+        value: :10000
+
+databases:
+  - name: dyad-db
+    region: frankfurt
+    plan: free
