@@ -1,24 +1,42 @@
-# Utilise une image Node.js officielle
-FROM node:20-alpine
+# Stage 1: Build the application
+FROM debian:bookworm-slim as builder
 
-# Crée un dossier de travail
+# Install build dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    build-essential \
+    cmake \
+    git \
+    libssl-dev \
+    ca-certificates \
+    curl \
+    pkg-config
+
+# Set working directory
 WORKDIR /app
 
-# Copie les fichiers de dépendances
-COPY package.json package-lock.json* pnpm-lock.yaml* yarn.lock* ./
-
-# Installe les dépendances (npm, pnpm ou yarn)
-RUN \
-  if [ -f package-lock.json ]; then npm ci; \
-  elif [ -f pnpm-lock.yaml ]; then npm install -g pnpm && pnpm install; \
-  elif [ -f yarn.lock ]; then yarn install --frozen-lockfile; \
-  else npm install; fi
-
-# Copie le reste du code
+# Copy the source code
 COPY . .
 
-# Compile (si besoin)
-RUN if [ -f tsconfig.json ]; then npm run build || true; fi
+# Configure and build the application
+RUN cmake -S . -B build -D CMAKE_BUILD_TYPE=Release
+RUN cmake --build build --parallel
 
-# Définit la commande de lancement (adapter selon le start script du projet)
-CMD [ "npm", "run", "start" ]
+# Stage 2: Create the final image
+FROM debian:bookworm-slim
+
+# Install runtime dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    libssl3 \
+    ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
+
+# Copy the built application from the builder stage
+COPY --from=builder /app/build/dyad /usr/local/bin/dyad
+
+# Expose the port the application will listen on
+EXPOSE 8080
+
+# Run the application
+CMD ["dyad"]
