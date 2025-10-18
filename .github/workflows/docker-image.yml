@@ -1,0 +1,53 @@
+# Clone ton repo
+git clone https://github.com/dyad-sh/dyad.git
+cd dyad
+
+# Build l'image
+docker build -t dyad:latest .
+
+# Tag pour ton registry (si Claw Cloud a un registry)
+docker tag dyad:latest [registry-url]/dyad:latest
+
+# Push
+docker push [registry-url]/dyad:latest
+```
+
+### 2. Config Claw Cloud correcte
+
+**Image Name:** `[ton-registry]/dyad:latest` (pas debian:bookworm-slim, c'est juste la base)
+
+**CPU/RAM:** 
+- Minimum : 0.5 vCPU, 256 M RAM
+- Idéal : 1 vCPU, 512 M RAM
+
+**Port:** 
+- Container Port: `8080` (c'est ce que ton Dockerfile expose)
+- Host Port: `80` (ou autre)
+
+**Environment Variables:**
+```
+DYAD_ADDRESS=:8080
+```
+
+**Command:** Vide (laisse le CMD du Dockerfile)
+
+**Arguments:** Vide
+
+### 3. Database locale Claw Cloud
+
+Tu dois créer une PostgreSQL database dans Claw Cloud :
+- Note le hostname, port, user, password
+- Crée une database nommée `dyad`
+- Met l'URL complète dans `DATABASE_URL`
+
+### 4. Volume pour persistence (optionnel)
+
+Si Dyad stocke des fichiers :
+- Mount path: `/data` (ou selon Dyad)
+- Size: 1-2 GB minimum
+
+## Webhook setup
+
+Ton `pvbeunycsetq.us-east-1.clawcloudrun.com/` est bizarre. Ça devrait être :
+```
+WEBHOOK_URL=https://pvbeunycsetq.us-east-1.clawcloudrun.com
